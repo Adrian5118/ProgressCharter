@@ -14,6 +14,8 @@ import java.util.List;
 public class Activity implements JSONSerializable {
     private String name;
     private String description;
+    private long cost = 0;
+    private boolean isFinished = false;
 
     private LocalDate startDate;
     private LocalDate endDate;
@@ -88,6 +90,14 @@ public class Activity implements JSONSerializable {
         childActivities.remove(activityName);
     }
 
+    public boolean contains(Activity childActivity) {
+        return childActivities.containsKey(childActivity.getName());
+    }
+
+    public int activitiesCount() {
+        return childActivities.size();
+    }
+
     // Dependency handling with parent's family
 
     /**
@@ -96,13 +106,15 @@ public class Activity implements JSONSerializable {
      * @param mode dependency mode
      */
     public void addDependency(Activity fellowActivity, Dependency mode) {
+        if(fellowActivity == this) {
+            throw new RuntimeException("Fellow activity cannot be itself.");
+        }
+
         if(parentActivity == null) {
-            System.err.println("Activity " + name + " has no parent. Cannot add new dependency!");
-            return;
+            throw new RuntimeException("Activity " + name + " has no parent. Cannot add new dependency.");
         }
         if(!parentActivity.childActivities.containsKey(fellowActivity.getName())) {
-            System.err.println("Activity " + name + " has different parent from " + fellowActivity.name + ". Cannot link as dependency");
-            return;
+            throw new RuntimeException("Activity " + name + " has different parent from " + fellowActivity.name + ". Cannot link as dependency.");
         }
 
         dependencies.put(fellowActivity.name, mode);
@@ -113,19 +125,32 @@ public class Activity implements JSONSerializable {
      * @param fellowActivity activity that has same parent as current activity
      */
     public void removeDependency(Activity fellowActivity) {
+        if(fellowActivity == this) {
+            throw new RuntimeException("Fellow activity cannot be itself.");
+        }
+
         if(parentActivity == null) {
-            System.err.println("Activity " + name + " has no parent. Cannot add new dependency!");
-            return;
+            throw new RuntimeException("Activity " + name + " has no parent. Cannot add new dependency!");
         }
         if(!parentActivity.childActivities.containsKey(fellowActivity.getName())) {
-            System.err.println("Activity " + name + " has different parent from " + fellowActivity.name + ". Cannot link as dependency");
-            return;
+            throw new RuntimeException("Activity " + name + " has different parent from " + fellowActivity.name + ". Cannot link as dependency");
         }
 
         dependencies.remove(fellowActivity.getName());
     }
 
-    // Date synchronization with child activities
+    // Synchronizations with child activities
+
+    public void synchronizeCost(boolean lazySync) {
+        if(childActivities.isEmpty()) return;
+        cost = 0;
+
+        for(Activity activity: childActivities.values()) {
+            if(!lazySync) activity.synchronizeCost(true);
+
+            cost += activity.cost;
+        }
+    }
 
     /**
      * Synchronize current activity's start and end date with
@@ -143,10 +168,11 @@ public class Activity implements JSONSerializable {
             if(newStartDate == null) {
                 newStartDate = activity.startDate;
             } else {
-                if(ChronoUnit.DAYS.between(activity.startDate, newStartDate) < 0) {
+                if(ChronoUnit.DAYS.between(activity.startDate, newStartDate) > 0) {
                     newStartDate = activity.startDate;
                 }
             }
+
             if(newEndDate == null) {
                 newEndDate = activity.endDate;
             } else {
@@ -158,6 +184,11 @@ public class Activity implements JSONSerializable {
 
         startDate = newStartDate;
         endDate = newEndDate;
+    }
+
+    // Miscellaneous
+    public void markAsFinished() {
+        this.isFinished = true;
     }
 
     // Setters and getters
@@ -185,12 +216,21 @@ public class Activity implements JSONSerializable {
 
         return null;
     }
+    public long getCost() {
+        return cost;
+    }
+    public boolean getIsFinished() {
+        return isFinished;
+    }
 
     public void setName(String name) {
         this.name = name;
     }
     public void setDescription(String description) {
         this.description = description;
+    }
+    public void setCost(long cost) {
+        this.cost = cost;
     }
 
     /**
@@ -199,8 +239,7 @@ public class Activity implements JSONSerializable {
      */
     public void setStartDate(LocalDate startDate) {
         if(!childActivities.isEmpty()) {
-            System.err.println("Start date is bound to child's start date.");
-            return;
+            throw new RuntimeException("Start date is bound to child's start date.");
         }
 
         this.startDate = startDate;
@@ -212,8 +251,7 @@ public class Activity implements JSONSerializable {
      */
     public void setEndDate(LocalDate endDate) {
         if(!childActivities.isEmpty()) {
-            System.err.println("End date is bound to child's end date.");
-            return;
+            throw new RuntimeException("End date is bound to child's end date.");
         }
 
         this.endDate = endDate;
@@ -228,6 +266,8 @@ public class Activity implements JSONSerializable {
         object.put("description", description);
         object.put("startDate", startDate);
         object.put("endDate", endDate);
+        object.put("cost", cost);
+        object.put("isFinished", isFinished);
 
         JSONArray childActivitiesJSON = new JSONArray();
         for(Activity childActivity: childActivities.values()) {
@@ -253,6 +293,8 @@ public class Activity implements JSONSerializable {
         description = object.getString("description");
         startDate = LocalDate.parse(object.getString("startDate"));
         endDate = LocalDate.parse(object.getString("endDate"));
+        cost = object.getLong("cost");
+        isFinished = object.getBoolean("isFinished");
 
         JSONArray childActivitiesJSON = object.getJSONArray("activities");
         childActivities.clear();
@@ -263,6 +305,8 @@ public class Activity implements JSONSerializable {
                     )
             );
         }
+        synchronizeDate(false);
+        synchronizeCost(false);
 
         JSONArray dependenciesJSON = object.getJSONArray("dependencies");
         dependencies.clear();
