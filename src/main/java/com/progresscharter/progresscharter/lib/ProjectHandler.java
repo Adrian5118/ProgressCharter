@@ -4,11 +4,11 @@ import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
 public class ProjectHandler {
-    private static String projectName = "";
+    private static String projectName = "New Project Name";
     private static String projectDescription = "";
-    private static String creatorName = "";
+    private static String creatorName = "Ramirez";
 
-    private static Activity currentActivity = null;
+    private static Activity currentActivity = new Activity("Root Level", "");
 
     public static String getProjectName() {
         return projectName;
@@ -36,7 +36,7 @@ public class ProjectHandler {
         ProjectHandler.currentActivity = currentActivity;
     }
 
-    public static JSONObject toJSONObject() throws JSONException {
+    public static JSONObject saveToJSON() throws JSONException {
         JSONObject object = new JSONObject();
         object.put("projectName", projectName);
         object.put("projectDescription", projectDescription);
@@ -46,7 +46,7 @@ public class ProjectHandler {
         return object;
     }
 
-    public static void fromJSONObject(JSONObject object) throws JSONException {
+    public static void readFromJSON(JSONObject object) throws JSONException {
         projectName = object.getString("projectName");
         projectDescription = object.getString("projectDescription");
         creatorName = object.getString("creatorName");

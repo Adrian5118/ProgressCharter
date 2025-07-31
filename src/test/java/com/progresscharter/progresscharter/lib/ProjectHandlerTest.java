@@ -51,10 +51,10 @@ class ProjectHandlerTest {
 
             ProjectHandler.setCurrentActivity(parentActivity);
 
-            JSONObject object = ProjectHandler.toJSONObject();
+            JSONObject object = ProjectHandler.saveToJSON();
             System.out.println(object.toString(4));
 
-            ProjectHandler.fromJSONObject(object);
+            ProjectHandler.readFromJSON(object);
         });
     }
 }

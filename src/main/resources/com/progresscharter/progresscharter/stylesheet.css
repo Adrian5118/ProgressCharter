@@ -1,0 +1,27 @@
+.overview {
+    -fx-padding: 0 0 0 20;
+}
+
+.overview > .title {
+    -fx-font-size: 28;
+    -fx-font-weight: bolder;
+}
+
+.overview > .infoPane {
+    -fx-font-size: 14;
+    -fx-padding: 5 0 5 5;
+}
+
+.overview > .infoPane > .label {
+    -fx-padding: 2 8 2 2;
+}
+
+.overview >.infoPane .button {
+    -fx-padding: 10 8 2 2;
+}
+
+.activity {
+    -fx-padding: 0 0 16 16;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 2;
+}

@@ -6,10 +6,7 @@ import org.codehaus.jettison.json.JSONObject;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Activity implements JSONSerializable {
     private String name;
@@ -21,8 +18,8 @@ public class Activity implements JSONSerializable {
     private LocalDate endDate;
 
     private Activity parentActivity;
-    private final HashMap<String, Activity> childActivities;
-    private final HashMap<String, Dependency> dependencies;
+    private final LinkedHashMap<String, Activity> childActivities;
+    private final LinkedHashMap<String, Dependency> dependencies;
 
     public Activity(String name, String description) {
         this.name = name;
@@ -32,8 +29,8 @@ public class Activity implements JSONSerializable {
         endDate = startDate.plusDays(1);
 
         parentActivity = null;
-        childActivities = new HashMap<>();
-        dependencies = new HashMap<>();
+        childActivities = new LinkedHashMap<>();
+        dependencies = new LinkedHashMap<>();
     }
 
     public Activity(JSONObject object) throws JSONException {
@@ -90,8 +87,19 @@ public class Activity implements JSONSerializable {
         childActivities.remove(activityName);
     }
 
+    /**
+     * Clear child activities. This will remove parent activity from child activities, while clearing dependencies of child activities.
+     */
+    public void clearChildActivities() {
+        childActivities.clear();
+    }
+
     public boolean contains(Activity childActivity) {
         return childActivities.containsKey(childActivity.getName());
+    }
+
+    public boolean hasParent() {
+        return parentActivity != null;
     }
 
     public int activitiesCount() {
