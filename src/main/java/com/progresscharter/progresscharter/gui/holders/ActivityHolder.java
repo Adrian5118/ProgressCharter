@@ -131,6 +131,10 @@ public class ActivityHolder extends Viewable {
         return activityReference;
     }
 
+    public void setHolderText(String text) {
+        activityName.setText(text);
+    }
+
     public void clear() {
         // Note: Do not use foreach method or function here. Use good ole indexed for loop to avoid error
         for(int i = 0; i < childHoldersList.size(); i++) {

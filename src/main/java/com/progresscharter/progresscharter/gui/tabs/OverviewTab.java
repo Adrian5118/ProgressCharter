@@ -52,7 +52,7 @@ public class OverviewTab extends ViewableTab {
             ProjectHandler.setProjectName(titleField.getText());
             ProjectHandler.getCurrentActivity().setName(titleField.getText());
             WBSTab wbsTabRef = (WBSTab) GlobalAccessor.access("wbsTab", this);
-            wbsTabRef.reload();
+            wbsTabRef.setRootHolderText(titleField.getText());
         });
 
         creatorLabel = new Label("Creator");

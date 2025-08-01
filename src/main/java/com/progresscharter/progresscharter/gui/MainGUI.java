@@ -113,6 +113,7 @@ public class MainGUI extends Viewable {
         tabPane.prefWidthProperty().bind(width);
         tabPane.prefHeightProperty().bind(height.multiply(0.95));
         tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+        tabPane.setTabDragPolicy(TabPane.TabDragPolicy.FIXED);
 
         tabPane.getTabs().addAll(
                 overviewTab.getTab(),

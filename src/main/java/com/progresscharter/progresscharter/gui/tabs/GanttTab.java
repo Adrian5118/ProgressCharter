@@ -83,6 +83,7 @@ public class GanttTab extends ViewableTab {
         for(Activity activity: currentActivities) {
             VBox activityVBox = new VBox();
             activityVBox.getStyleClass().add("activity");
+            if(!activity.getChildActivities().isEmpty()) activityVBox.getStyleClass().add("hasParent");
             activityVBox.prefWidthProperty().bind(chartActivities.widthProperty());
             activityVBox.prefHeightProperty().bind(height.multiply(0.1));
             activityVBox.setOnMouseClicked(event -> {
@@ -161,25 +162,26 @@ public class GanttTab extends ViewableTab {
             datesVBox.prefHeightProperty().bind(height.multiply(0.1));
             datesVBox.setAlignment(Pos.CENTER_LEFT);
 
-
+            // Set to 10 for backup
+            double scale = chartComponents.widthProperty().multiply(0.9).doubleValue() / ProjectHandler.getCurrentActivity().getDuration();
 
             VBox datesBar = new VBox();
             datesBar.setStyle("-fx-background-color: #1298ff;");
             datesBar.prefHeightProperty().bind(datesVBox.heightProperty().multiply(0.5));
-            datesBar.setPrefWidth(activity.getDuration() * 10);
-            datesBar.setMaxWidth(activity.getDuration() * 10);
+            datesBar.setPrefWidth(activity.getDuration() * scale);
+            datesBar.setMaxWidth(activity.getDuration() * scale);
             datesBar.setTranslateX(
                     datesVBox.getTranslateX() +
                     (Math.abs(ChronoUnit.DAYS.between(
                             activity.getStartDate(),
                             ProjectHandler.getCurrentActivity().getStartDate())) *
-                            10
+                            scale
                     )
             );
 
             Tooltip hoverTooltip = new Tooltip();
             datesBar.setOnMouseMoved(event -> {
-                hoverTooltip.setText(activity.getStartDate().plusDays(Math.round(event.getX() / 10)).toString());
+                hoverTooltip.setText(activity.getStartDate().plusDays(Math.round(event.getX() / scale)).toString());
             });
             Tooltip.install(datesBar, hoverTooltip);
 

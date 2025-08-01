@@ -57,6 +57,10 @@ public class WBSTab extends ViewableTab {
         return root;
     }
 
+    public void setRootHolderText(String text) {
+        rootHolder.setHolderText(text);
+    }
+
     @Override
     public void reload() {
         rootHolder.clear();

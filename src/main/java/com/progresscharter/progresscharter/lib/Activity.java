@@ -111,6 +111,10 @@ public class Activity implements JSONSerializable {
         return parentActivity != null;
     }
 
+    public boolean hasChildren() {
+        return childActivities.isEmpty();
+    }
+
     public int activitiesCount() {
         return childActivities.size();
     }

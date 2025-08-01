@@ -71,7 +71,7 @@ public class CMTab extends ViewableTab {
                     }
 
                     field = new TextField(activity.getCost() + "");
-                    if(!activity.getChildActivities().isEmpty()) {
+                    if(!activity.hasChildren()) {
                         activity.synchronizeCost(false);
                         field.setDisable(true);
                         field.setText(activity.getCost() + "");
@@ -117,7 +117,7 @@ public class CMTab extends ViewableTab {
                     return;
                 }
 
-                if(!item.getChildActivities().isEmpty() || ProjectHandler.getCurrentActivity().contains(item)) {
+                if(!item.hasChildren() || ProjectHandler.getCurrentActivity().contains(item)) {
                     setStyle("-fx-background-color: #dbdbdb;");
                 }
             }
