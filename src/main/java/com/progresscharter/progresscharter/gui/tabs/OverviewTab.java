@@ -3,6 +3,7 @@ package com.progresscharter.progresscharter.gui.tabs;
 import com.progresscharter.progresscharter.gui.Viewable;
 import com.progresscharter.progresscharter.gui.ViewableTab;
 import com.progresscharter.progresscharter.lib.Activity;
+import com.progresscharter.progresscharter.lib.GlobalAccessor;
 import com.progresscharter.progresscharter.lib.ProjectHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -49,6 +50,9 @@ public class OverviewTab extends ViewableTab {
         titleField = new TextField(ProjectHandler.getProjectName());
         titleField.setOnAction(event -> {
             ProjectHandler.setProjectName(titleField.getText());
+            ProjectHandler.getCurrentActivity().setName(titleField.getText());
+            WBSTab wbsTabRef = (WBSTab) GlobalAccessor.access("wbsTab", this);
+            wbsTabRef.reload();
         });
 
         creatorLabel = new Label("Creator");

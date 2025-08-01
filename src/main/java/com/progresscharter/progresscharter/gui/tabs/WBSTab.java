@@ -4,6 +4,7 @@ import com.progresscharter.progresscharter.gui.Viewable;
 import com.progresscharter.progresscharter.gui.ViewableTab;
 import com.progresscharter.progresscharter.gui.holders.ActivityHolder;
 import com.progresscharter.progresscharter.lib.Activity;
+import com.progresscharter.progresscharter.lib.GlobalAccessor;
 import com.progresscharter.progresscharter.lib.ProjectHandler;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
@@ -27,11 +28,15 @@ public class WBSTab extends ViewableTab {
 
     public WBSTab(String name, Viewable viewable) {
         super(name, viewable);
+        GlobalAccessor.addToAccessList("wbsTab", this);
+        GlobalAccessor.addPerm("wbsTab", OverviewTab.class);
+
         root = new VBox();
         root.prefWidthProperty().bind(width);
         root.prefHeightProperty().bind(height);
 
         scrollPane = new ScrollPane();
+        scrollPane.getStyleClass().add("wbsPane");
         scrollPane.prefWidthProperty().bind(width);
         scrollPane.prefHeightProperty().bind(height);
 

@@ -2,6 +2,7 @@ package com.progresscharter.progresscharter.gui.holders;
 
 import com.progresscharter.progresscharter.gui.Viewable;
 import com.progresscharter.progresscharter.lib.Activity;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
@@ -23,8 +24,12 @@ public class ActivityHolder extends Viewable {
     private Button hideButton;
     private TextField activityName;
     private Button deleteButton;
+
+    private VBox centerFiller;
+
     private VBox childHolders;
     private ArrayList<ActivityHolder> childHoldersList;
+
     private Button addButton;
 
     public ActivityHolder(Viewable viewable, Activity activity) {
@@ -33,13 +38,15 @@ public class ActivityHolder extends Viewable {
         root = new VBox();
         root.getStyleClass().add("activity");
         activityReference = activity;
-        root.prefWidthProperty().bind(width.multiply(0.9));
+        width.multiply(0.9);
+        root.prefWidthProperty().bind(width);
         parentHolder = null;
 
         holderDetail = new BorderPane();
 
         HBox holderDetail_left = new HBox();
         activityName = new TextField(activity.getName());
+        activityName.setEditable(false);
         activityName.setOnAction(event -> {
             activity.setName(activityName.getText());
         });
@@ -56,13 +63,25 @@ public class ActivityHolder extends Viewable {
                 activityName
         );
 
+        centerFiller = new VBox();
+        centerFiller.setStyle("-fx-background-color: #dbdbdb;");
+
         deleteButton = new Button("X");
         deleteButton.setDisable(parentHolder == null);
         deleteButton.setOnAction(event -> {
             clear();
         });
 
+        centerFiller.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> {
+                    return root.getWidth() - holderDetail_left.getWidth() - deleteButton.getWidth();
+                },
+                root.widthProperty(),
+                holderDetail_left.widthProperty(),
+                deleteButton.widthProperty()
+        ));
+
         holderDetail.setLeft(holderDetail_left);
+        holderDetail.setCenter(centerFiller);
         holderDetail.setRight(deleteButton);
 
         childHolders = new VBox();
@@ -78,11 +97,11 @@ public class ActivityHolder extends Viewable {
         addButton.prefWidthProperty().bind(width);
         addButton.setOnAction(event -> {
             Activity childActivity = new Activity(
-            getParentsAsString() + (childHoldersList.size() + 1) + ".",
-            ""
+                getParentsAsString() + (childHoldersList.size() + 1) + ".",
+                "",
+                activityReference
             );
 
-            activity.addChildActivity(childActivity);
             childHoldersList.add(new ActivityHolder(childActivity, this));
             reloadChildHolder();
         });
@@ -99,6 +118,7 @@ public class ActivityHolder extends Viewable {
         this(parentHolder, childActivity);
         this.parentHolder = parentHolder;
         deleteButton.setDisable(false);
+        activityName.setEditable(true);
     }
 
     @Override

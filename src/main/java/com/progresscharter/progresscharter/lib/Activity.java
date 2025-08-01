@@ -4,6 +4,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -36,6 +37,14 @@ public class Activity implements JSONSerializable {
     public Activity(JSONObject object) throws JSONException {
         this("", "");
         fromJSONObject(object);
+    }
+
+    public Activity(String name, String description, Activity parentActivity) {
+        this(name, description);
+        this.addParentActivity(parentActivity);
+        this.startDate = parentActivity.startDate;
+        this.endDate = parentActivity.endDate;
+        this.cost = parentActivity.cost;
     }
 
     // Parent and child activity handling
@@ -154,7 +163,7 @@ public class Activity implements JSONSerializable {
         cost = 0;
 
         for(Activity activity: childActivities.values()) {
-            if(!lazySync) activity.synchronizeCost(true);
+            if(!lazySync) activity.synchronizeCost(false);
 
             cost += activity.cost;
         }
@@ -212,6 +221,9 @@ public class Activity implements JSONSerializable {
     public LocalDate getEndDate() {
         return endDate;
     }
+    public Long getDuration() {
+        return Math.abs(ChronoUnit.DAYS.between(startDate, endDate)) + 1;
+    }
     public Collection<Activity> getChildActivities() {
         return childActivities.values();
     }
@@ -251,6 +263,10 @@ public class Activity implements JSONSerializable {
         }
 
         this.startDate = startDate;
+        if(ChronoUnit.DAYS.between(this.startDate, this.endDate) < 1) {
+            System.out.println("Start date is ahead of end date, readjusting.");
+            this.endDate = this.startDate.plusDays(1);
+        }
     }
 
     /**
@@ -260,6 +276,10 @@ public class Activity implements JSONSerializable {
     public void setEndDate(LocalDate endDate) {
         if(!childActivities.isEmpty()) {
             throw new RuntimeException("End date is bound to child's end date.");
+        }
+
+        if(ChronoUnit.DAYS.between(this.startDate, endDate) < 1) {
+            throw new DateTimeException("Cannot set end date behind start date");
         }
 
         this.endDate = endDate;

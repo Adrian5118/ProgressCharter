@@ -1,5 +1,7 @@
 package com.progresscharter.progresscharter.gui;
 
+import com.progresscharter.progresscharter.gui.tabs.CMTab;
+import com.progresscharter.progresscharter.gui.tabs.GanttTab;
 import com.progresscharter.progresscharter.gui.tabs.OverviewTab;
 import com.progresscharter.progresscharter.gui.tabs.WBSTab;
 import com.progresscharter.progresscharter.lib.FileHandler;
@@ -28,10 +30,14 @@ public class MainGUI extends Viewable {
     private final HBox header;
     private final Menu filesMenu;
     private final MenuBar filesMenuBar;
+    private final Menu projectMenu;
+    private final MenuBar projectMenuBar;
 
     private TabPane tabPane;
     private final OverviewTab overviewTab;
     private final WBSTab wbsTab;
+    private final CMTab cmTab;
+    private final GanttTab ganttTab;
 
     public MainGUI(Region region) {
         super(region);
@@ -48,19 +54,25 @@ public class MainGUI extends Viewable {
 
         overviewTab = new OverviewTab("Overview", this);
         wbsTab = new WBSTab("Work Breakdown Structure", this);
+        cmTab = new CMTab("Cost Management", this);
+        ganttTab = new GanttTab("Gantt Chart", this);
 
         header = new HBox();
         header.prefWidthProperty().bind(width);
         header.prefHeightProperty().bind(height.multiply(0.05));
+        header.setFillHeight(true);
         header.getStyleClass().add("header");
 
         filesMenu = new Menu("Files");
         filesMenu.getItems().addAll(
+                createMenuItem("New", event -> {
+                    ProjectHandler.newProject();
+                    reloadTabs(true, true, true, true);
+                }),
+                new SeparatorMenuItem(),
                 createMenuItem("Open", event -> {
                     try {
-                        openOpenFileWindow();
-                        overviewTab.reload();
-                        wbsTab.reload();
+                        if(openOpenFileWindow()) reloadTabs(true, true, true, true);
                     } catch (Exception e) {
                         Alert loadErrAlert = new Alert(Alert.AlertType.ERROR, "Unable to load project file");
                         System.err.println(e.getMessage());
@@ -85,9 +97,17 @@ public class MainGUI extends Viewable {
                     System.exit(0);
                 })
         );
-
         filesMenuBar = new MenuBar(filesMenu);
         filesMenuBar.prefHeightProperty().bind(header.heightProperty());
+
+        projectMenu = new Menu("Project");
+        projectMenu.getItems().addAll(
+                createMenuItem("Sync Changes", event -> {
+                    reloadTabs(false, false, true, true);
+                })
+        );
+        projectMenuBar = new MenuBar(projectMenu);
+        projectMenuBar.prefHeightProperty().bind(header.heightProperty());
 
         tabPane = new TabPane();
         tabPane.prefWidthProperty().bind(width);
@@ -96,11 +116,15 @@ public class MainGUI extends Viewable {
 
         tabPane.getTabs().addAll(
                 overviewTab.getTab(),
-                wbsTab.getTab()
+                wbsTab.getTab(),
+                cmTab.getTab(),
+                ganttTab.getTab()
         );
 
         header.getChildren().addAll(
-                filesMenuBar
+                filesMenuBar,
+                projectMenuBar,
+                new Label("Press ENTER to apply changes for any text fields")
         );
 
         root.setTop(header);
@@ -160,7 +184,7 @@ public class MainGUI extends Viewable {
         }
     }
 
-    private void openSaveAsWindow() throws JSONException, IOException {
+    private boolean openSaveAsWindow() throws JSONException, IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialFileName(FileHandler.getCurrentFileName());
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
@@ -172,13 +196,13 @@ public class MainGUI extends Viewable {
 
         File saveFile = fileChooser.showSaveDialog(currentStage);
 
-        if(saveFile == null) return;
+        if(saveFile == null) return false;
 
         FileHandler.save(saveFile);
-
+        return true;
     }
 
-    private void openOpenFileWindow() throws JSONException, IOException {
+    private boolean openOpenFileWindow() throws JSONException, IOException {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
         fileChooser.setTitle("Open Project File");
@@ -189,8 +213,16 @@ public class MainGUI extends Viewable {
 
         File openFile = fileChooser.showOpenDialog(currentStage);
 
-        if(openFile == null) return;
+        if(openFile == null) return false;
 
         FileHandler.open(openFile);
+        return true;
+    }
+
+    private void reloadTabs(boolean reloadOverview, boolean reloadWbs, boolean reloadCm, boolean reloadGantt) {
+        if(reloadOverview) overviewTab.reload();
+        if(reloadWbs) wbsTab.reload();
+        if(reloadCm) cmTab.reload();
+        if(reloadGantt) ganttTab.reload();
     }
 }

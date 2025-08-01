@@ -1,3 +1,7 @@
+.header > .label {
+    -fx-alignment:center;
+}
+
 .overview {
     -fx-padding: 0 0 0 20;
 }
@@ -22,6 +26,27 @@
 
 .activity {
     -fx-padding: 0 0 16 16;
-    -fx-border-color: #CCCCCC;
+    -fx-border-color: #B0B0B0;
     -fx-border-width: 2;
+}
+
+.costManagement {
+    -fx-padding: 0 0 0 20;
+}
+
+.costManagement > .title {
+    -fx-font-size: 28;
+    -fx-font-weight: bolder;
+}
+
+.chartComponent > .activity {
+    -fx-padding: 0;
+    -fx-border-color: #B0B0B0;
+    -fx-border-width: 1;
+}
+
+.chartComponent > .date {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #B0B0B0;
+    -fx-border-width: 1;
 }

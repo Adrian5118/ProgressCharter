@@ -6,9 +6,17 @@ import org.codehaus.jettison.json.JSONObject;
 public class ProjectHandler {
     private static String projectName = "New Project Name";
     private static String projectDescription = "";
-    private static String creatorName = "Ramirez";
+    private static String creatorName = "";
 
     private static Activity currentActivity = new Activity("Root Level", "");
+
+    public static void newProject() {
+        projectName = "New Project Name";
+        projectDescription = "";
+        creatorName = "";
+        currentActivity.clearChildActivities();
+        currentActivity = new Activity("Root Level", "");
+    }
 
     public static String getProjectName() {
         return projectName;
