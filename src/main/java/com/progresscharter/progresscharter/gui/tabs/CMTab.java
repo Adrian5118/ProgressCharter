@@ -22,6 +22,8 @@ public class CMTab extends ViewableTab {
     private final Label costManagementTitle;
 
     private final GridPane costManagementSummaryPane;
+    private final Label totalCost;
+    private final Label averageCost;
 
     private final TableView costManagementTable;
     private final TableColumn<Activity, String> activityNameColumn;
@@ -45,6 +47,17 @@ public class CMTab extends ViewableTab {
         costManagementTitle.getStyleClass().add("title");
 
         costManagementSummaryPane = new GridPane();
+        costManagementSummaryPane.getStyleClass().add("infoPane");
+        totalCost = new Label(ProjectHandler.getCurrentActivity().getCost() + "");
+        averageCost = new Label((ProjectHandler.getCurrentActivity().getCost() / ProjectHandler.getCurrentActivity().getDuration()) + "");
+
+        costManagementSummaryPane.add(new Label("Total Cost"), 0, 0);
+        costManagementSummaryPane.add(new Label(":"), 1, 0);
+        costManagementSummaryPane.add(totalCost, 2, 0);
+
+        costManagementSummaryPane.add(new Label("Average Cost"), 0, 1);
+        costManagementSummaryPane.add(new Label(":"), 1, 1);
+        costManagementSummaryPane.add(averageCost, 2, 1);
 
         costManagementTable = new TableView<Activity>();
         activityNameColumn = new TableColumn<>("Activity");
@@ -142,6 +155,12 @@ public class CMTab extends ViewableTab {
                         ProjectHandler.getCurrentActivity()
                 )
         );
+
+        ProjectHandler.getCurrentActivity().synchronizeCost(false);
+        ProjectHandler.getCurrentActivity().synchronizeDate(false);
+
+        totalCost.setText(ProjectHandler.getCurrentActivity().getCost() + "");
+        averageCost.setText((ProjectHandler.getCurrentActivity().getCost() / ProjectHandler.getCurrentActivity().getDuration()) + "");
 
         costManagementTable.getItems().clear();
         costManagementTable.getItems().addAll(currentActivities);

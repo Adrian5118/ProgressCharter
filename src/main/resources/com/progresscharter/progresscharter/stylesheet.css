@@ -30,6 +30,15 @@
     -fx-border-width: 2;
 }
 
+.costManagement > .infoPane {
+    -fx-font-size: 14;
+    -fx-padding: 5 0 5 5;
+}
+
+.costManagement > .infoPane > .label {
+    -fx-padding: 2 8 2 2;
+}
+
 .costManagement {
     -fx-padding: 0 0 0 20;
 }

@@ -41,10 +41,10 @@ public class Activity implements JSONSerializable {
 
     public Activity(String name, String description, Activity parentActivity) {
         this(name, description);
+        this.cost = !parentActivity.hasChildren()? 0 : parentActivity.cost;
         this.addParentActivity(parentActivity);
         this.startDate = parentActivity.startDate;
         this.endDate = parentActivity.endDate;
-        this.cost = parentActivity.cost;
     }
 
     // Parent and child activity handling
